@@ -121,7 +121,7 @@ class Pipeline:
         if not input_file:
             input_file = self.train_file_path
         pairs = pd.read_pickle(input_file)
-        train_ids = pairs['id1'].append(pairs['id2']).unique()
+        train_ids = pd.concat([pairs['id1'], pairs['id2']]).unique()
 
         trees = self.sources.set_index('id', drop=False).loc[train_ids]
         if not os.path.exists(data_path+'train/embedding'):
@@ -142,7 +142,7 @@ class Pipeline:
         # trees.to_csv(data_path+'train/programs_ns.tsv')
 
         from gensim.models.word2vec import Word2Vec
-        w2v = Word2Vec(corpus, size=size, workers=16, sg=1, min_count=MIN_COUNT, max_final_vocab=VOCAB_SIZE)
+        w2v = Word2Vec(corpus, vector_size=size, workers=16, sg=1, min_count=MIN_COUNT, max_final_vocab=VOCAB_SIZE)
         w2v.save(data_path+'train/embedding/node_w2v_' + str(size))
 
     # generate block sequences with index representations
@@ -157,12 +157,12 @@ class Pipeline:
             self.root + '/'+ self.language+'/train/embedding/node_w2v_' +
             str(self.size)
         ).wv
-        vocab = word2vec.vocab
-        max_token = word2vec.syn0.shape[0]
+        vocab = word2vec.key_to_index
+        max_token = word2vec.vectors.shape[0]
 
         def tree_to_index(node):
             token = node.token
-            result = [vocab[token].index if token in vocab else max_token]
+            result = [vocab[token] if token in vocab else max_token]
             children = node.children
             for child in children:
                 result.append(tree_to_index(child))

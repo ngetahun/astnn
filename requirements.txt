@@ -1,0 +1,9 @@
+pandas>=2.0.0
+gensim>=4.0.0
+scikit-learn>=1.0.0
+pycparser>=2.21
+javalang>=0.13.0
+numpy>=1.24.0
+tqdm>=4.64.0
+click>=8.0.0
+torch>=2.0.0
