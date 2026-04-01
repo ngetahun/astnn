@@ -5,7 +5,6 @@ import time
 import numpy as np
 from gensim.models.word2vec import Word2Vec
 from model import BatchProgramClassifier
-from torch.autograd import Variable
 from torch.utils.data import DataLoader
 from config import *
 import os
@@ -28,11 +27,11 @@ if __name__ == '__main__':
     test_data = pd.read_pickle(root+'test/blocks.pkl')
 
     word2vec = Word2Vec.load(root+"train/embedding/node_w2v_128").wv
-    embeddings = np.zeros((word2vec.syn0.shape[0] + 1, word2vec.syn0.shape[1]), dtype="float32")
-    embeddings[:word2vec.syn0.shape[0]] = word2vec.syn0
+    embeddings = np.zeros((word2vec.vectors.shape[0] + 1, word2vec.vectors.shape[1]), dtype="float32")
+    embeddings[:word2vec.vectors.shape[0]] = word2vec.vectors
 
-    MAX_TOKENS = word2vec.syn0.shape[0]
-    EMBEDDING_DIM = word2vec.syn0.shape[1]
+    MAX_TOKENS = word2vec.vectors.shape[0]
+    EMBEDDING_DIM = word2vec.vectors.shape[1]
 
     model = BatchProgramClassifier(EMBEDDING_DIM,HIDDEN_DIM,MAX_TOKENS+1,ENCODE_DIM,LABELS,BATCH_SIZE,
                                    USE_GPU, embeddings)
@@ -70,7 +69,7 @@ if __name__ == '__main__':
             model.hidden = model.init_hidden()
             output = model(train_inputs)
 
-            loss = loss_function(output, Variable(train_labels))
+            loss = loss_function(output, train_labels)
             loss.backward()
             optimizer.step()
 
@@ -98,7 +97,7 @@ if __name__ == '__main__':
             model.hidden = model.init_hidden()
             output = model(val_inputs)
 
-            loss = loss_function(output, Variable(val_labels))
+            loss = loss_function(output, val_labels)
 
             # calc valing acc
             _, predicted = torch.max(output.data, 1)
@@ -131,7 +130,7 @@ if __name__ == '__main__':
         model.hidden = model.init_hidden()
         output = model(test_inputs)
 
-        loss = loss_function(output, Variable(test_labels))
+        loss = loss_function(output, test_labels)
 
         _, predicted = torch.max(output.data, 1)
         total_acc += (predicted == test_labels).sum()

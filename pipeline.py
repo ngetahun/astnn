@@ -106,7 +106,7 @@ class Pipeline:
         trees.to_csv(self.root+'train/programs_ns.tsv')
 
         from gensim.models.word2vec import Word2Vec
-        w2v = Word2Vec(corpus, size=size, workers=16, sg=1, min_count=MIN_COUNT, max_final_vocab=VOCAB_SIZE)
+        w2v = Word2Vec(corpus, vector_size=size, workers=16, sg=1, min_count=MIN_COUNT, max_final_vocab=VOCAB_SIZE)
         w2v.save(self.root+'train/embedding/node_w2v_' + str(size))
 
     # generate block sequences with index representations
@@ -115,12 +115,12 @@ class Pipeline:
         from gensim.models.word2vec import Word2Vec
 
         word2vec = Word2Vec.load(self.root+'train/embedding/node_w2v_' + str(self.size)).wv
-        vocab = word2vec.vocab
-        max_token = word2vec.syn0.shape[0]
+        vocab = word2vec.key_to_index
+        max_token = word2vec.vectors.shape[0]
 
         def tree_to_index(node):
             token = node.token
-            result = [vocab[token].index if token in vocab else max_token]
+            result = [vocab[token] if token in vocab else max_token]
             children = node.children
             for child in children:
                 result.append(tree_to_index(child))

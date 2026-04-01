@@ -5,7 +5,6 @@ import numpy as np
 import warnings
 from gensim.models.word2vec import Word2Vec
 from model import BatchProgramCC
-from torch.autograd import Variable
 from sklearn.metrics import precision_recall_fscore_support
 from config import *
 warnings.filterwarnings('ignore')
@@ -40,10 +39,10 @@ if __name__ == '__main__':
     test_data = pd.read_pickle(root+lang+'/test/blocks.pkl').sample(frac=1)
 
     word2vec = Word2Vec.load(root+lang+"/train/embedding/node_w2v_128").wv
-    MAX_TOKENS = word2vec.syn0.shape[0]
-    EMBEDDING_DIM = word2vec.syn0.shape[1]
+    MAX_TOKENS = word2vec.vectors.shape[0]
+    EMBEDDING_DIM = word2vec.vectors.shape[1]
     embeddings = np.zeros((MAX_TOKENS + 1, EMBEDDING_DIM), dtype="float32")
-    embeddings[:word2vec.syn0.shape[0]] = word2vec.syn0
+    embeddings[:word2vec.vectors.shape[0]] = word2vec.vectors
 
     model = BatchProgramCC(EMBEDDING_DIM,HIDDEN_DIM,MAX_TOKENS+1,ENCODE_DIM,LABELS,BATCH_SIZE,
                                    USE_GPU, embeddings)
@@ -86,7 +85,7 @@ if __name__ == '__main__':
                 model.hidden = model.init_hidden()
                 output = model(train1_inputs, train2_inputs)
 
-                loss = loss_function(output, Variable(train_labels))
+                loss = loss_function(output, train_labels)
                 loss.backward()
                 optimizer.step()
         print("Testing-%d..."%t)
@@ -107,8 +106,7 @@ if __name__ == '__main__':
             model.hidden = model.init_hidden()
             output = model(test1_inputs, test2_inputs)
 
-            loss = loss_function(output, Variable(test_labels))
-
+            loss = loss_function(output, test_labels)
             # calc testing acc
             predicted = (output.data > 0.5).cpu().numpy()
             predicts.extend(predicted)

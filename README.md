@@ -1,24 +1,40 @@
 # ASTNN--A Novel Neural Source Code Representation based on Abstract Syntax Tree
 This repository includes the code and experimental data in our paper entitled "A Novel Neural Source Code Representation based on Abstract Syntax Tree" published in ICSE'2019. It can be used to encode code fragments into supervised vectors for various source code related tasks. We have applied our neural source code representation to two common tasks: source code classification and code clone detection. It is also expected to be helpful in more tasks.
 
+> **Python 3.11 compatible.** The codebase has been migrated from Python 3.6 to Python 3.11+ standards. See [MIGRATION.md](MIGRATION.md) for a full record of all changes made.
+
 ### Requirements
-+ python 3.6.7<br> Note: the version should be exactly the same to properly load pickle files.
-+ pandas 0.20.3<br>
-+ gensim 3.5.0<br>
-+ scikit-learn 0.19.1<br>
-+ pytorch 1.0.0<br> (The version used in our paper is 0.3.1 and source code can be cloned by specifying the v1.0.0 tag if needed)
-+ pycparser 2.18<br>
-+ javalang 0.11.0<br>
-+ RAM 16GB or more
++ Python 3.11+
++ pandas >= 2.0.0
++ gensim >= 4.0.0
++ scikit-learn >= 1.0.0
++ PyTorch >= 2.0.0 — install according to your environment, see https://pytorch.org/
++ pycparser >= 2.21
++ javalang >= 0.13.0
++ numpy >= 1.24.0
++ tqdm >= 4.64.0
++ click >= 8.0.0
++ RAM 16 GB or more
 + GPU with CUDA support is also needed
 + BATCH_SIZE should be configured based on the GPU memory size
 
 ### How to install
-Install all the dependent packages via pip:
+Install all dependencies at once using the provided `requirements.txt`:
 
-	$ pip install pandas==0.20.3 gensim==3.5.0 scikit-learn==0.19.1 pycparser==2.18 javalang==0.11.0
- 
-Install pytorch according to your environment, see https://pytorch.org/ 
+```bash
+pip install -r requirements.txt
+```
+
+Then install PyTorch according to your environment (CPU-only or CUDA version):
+
+```bash
+# example: CUDA 12.1
+pip install torch --index-url https://download.pytorch.org/whl/cu121
+# or CPU-only
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+```
+
+See https://pytorch.org/get-started/locally/ for the full selector.
 
 
 ### Source Code Classification
